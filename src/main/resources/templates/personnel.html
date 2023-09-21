@@ -1,0 +1,55 @@
+ <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset = "UTF-8">
+        <link href = "css/styles.css" rel = "stylesheet"/>
+        <title>Spring Boot Application</title>
+    </head> 
+    <body>
+        <H1 align="center">CRUD</H1>
+        <table class="table">
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <form  method="POST" th:action="@{/crud/add}" th:object="${personnel}">
+                    <!-- <h2 align="center"> Formulaire</h2> -->
+                    <td><input type="text" name="name"></input></td>
+                    <td><input type="text" name="prenom"></input></td>
+                    <td><input type="text" name="description"></input></td>
+                    <td><button class="btn btn-outline-success" type="submit">Ajouter</button></td>
+                </form>
+            </tr>
+            <!-- Affiche chaque employé dans une ligne du tableau  -->
+             <tr th:each="personnel : ${personnels}"> 
+                <td th:text="${personnel.name}"></td>
+                <td th:text="${personnel.prenom}"></td>
+                <td th:text="${personnel.description}"></td>
+                <td>
+                    <!-- <a th:href="@{'/crud/delete/'+ ${personnel.id}}"> Supprimer</a> -->
+                    <form th:action="@{'/crud/delete/'+ ${personnel.id}}" th:object="${personnel.id}" method="DELETE">
+                        <input type="hidden" th:field="${personnels}"/>
+                        <input class="btn btn-outline-danger" type="submit" value="Supprimer"/>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{'/crud/read/'+ ${personnel.id}}" th:object="${personnel.id}" method="PUT">
+                        <input type="hidden" th:field="${personnels}"/>
+                        <input class="btn btn-outline-warning" type="submit" value="Modifier"/>
+                    </form>
+                </td>
+             </tr> 
+        </table>
+    </body>
+</html> 
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+<style>
+    table {
+        /* margin-left: 5%; */
+        margin-right: 5%;
+    }
+</style>

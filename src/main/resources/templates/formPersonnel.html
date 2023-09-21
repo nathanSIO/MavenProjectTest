@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset = "UTF-8">
+    <link href = "css/styles.css" rel = "stylesheet"/>
+    <title>Spring Boot Application</title>
+  </head>
+  <body>
+    <form  method="POST" th:action="@{/crud/add}" th:object="${personnel}">
+        <h2 align="center"> Formulaire</h2>
+        <a> Nom : </a><input type="text" name="name"></input><br><br>
+        <a> Prénom : </a><input type="text" name="prenom"></input><br><br>
+        <a> Description : </a><input type="text" name="description"></input><br><br>
+
+        <button type="submit">Enregistrer</button><br>
+    </form>
+  </body>
+</html>
+
+<!-- -->
+
