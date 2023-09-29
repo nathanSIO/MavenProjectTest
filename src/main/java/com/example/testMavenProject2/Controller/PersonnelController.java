@@ -33,7 +33,7 @@ public class PersonnelController {
 	}
 
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public String addPersonnelBis(@ModelAttribute PersonnelEntity personnel,Model model){
+	public String addPersonnel(@ModelAttribute PersonnelEntity personnel,Model model){
     	// RequestParam / RequestBody
 		try {
             String personnelJson = objectMapper.writeValueAsString(personnel);

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.testMavenProject2.Entity.FichierEntity;
+import com.example.testMavenProject2.Repository.FichierRepository;
 import com.example.testMavenProject2.Service.UploadService;
 
 
@@ -23,20 +25,13 @@ public class FichierController {
     @Autowired
     private UploadService uploadService;
 
+    @Autowired
+    private FichierRepository fichierRepository;
+
     @RequestMapping(value = "/accueil", method = RequestMethod.GET)
     public String Acceuil(){
         return "uploadFichier";
     }
-
-    // @RequestMapping(value="/upload", method = RequestMethod.POST)
-    // public void uploadFile(@RequestParam MultipartFile file) throws IOException{
-        
-    //     System.err.println("je suis ici : " + file);
-    //     String fileName  = file.getOriginalFilename();
-    //     int filelenth = file.getBytes().length;
-    //     System.err.println(fileName);
-    //     System.err.println(filelenth);    
-    // }
 
     @RequestMapping(value="/upload", method = RequestMethod.POST)
     public String uploadFile(@RequestParam MultipartFile file) throws Exception {
@@ -48,10 +43,13 @@ public class FichierController {
         System.err.println(uuid);
         System.err.println(filelength);
 
-        // uploadService.uploadFile(null, 0);:
-        uploadService.uploadFile(uuid, filelength);
-        Map<String, String> result = new HashMap<>();
-        result.put("key", file.getOriginalFilename());
+        FichierEntity f1 = new FichierEntity(null, UUID.randomUUID().toString(), file.getOriginalFilename());
+        uploadService.uploadFile(uuid, file.getOriginalFilename());
+        // Map<String, String> result = new HashMap<>();
+        // result.put(uuid, file.getOriginalFilename());
+        fichierRepository.save(f1);
+
+        uploadService.getFile(uuid);
         return "erreur";
     }
 }
