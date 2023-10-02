@@ -38,13 +38,13 @@ public class FichierController {
         System.err.println("je suis ici : " + file);
 
         String uuid  = UUID.randomUUID().toString();
-        int filelength = file.getBytes().length;
+        long filelength = file.getBytes().length;
 
         System.err.println(uuid);
         System.err.println(filelength);
 
         FichierEntity f1 = new FichierEntity(null, UUID.randomUUID().toString(), file.getOriginalFilename());
-        uploadService.uploadFile(uuid, file.getOriginalFilename());
+        uploadService.uploadFile(uuid, file.getOriginalFilename(),filelength, file);
         // Map<String, String> result = new HashMap<>();
         // result.put(uuid, file.getOriginalFilename());
         fichierRepository.save(f1);

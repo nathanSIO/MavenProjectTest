@@ -1,11 +1,14 @@
 package com.example.testMavenProject2.Service;
 
 import io.minio.GetObjectArgs;
+import io.minio.ListObjectsArgs;
 import io.minio.MinioClient;
 import io.minio.ObjectWriteResponse;
 import io.minio.PutObjectArgs;
+import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.messages.Bucket;
+import io.minio.messages.Item;
 
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.taglibs.standard.extra.spath.Path;
@@ -17,6 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -60,56 +64,76 @@ public class UploadService {
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
-        }        
+        }   
+        
+        System.out.println("checkS3Alive");
+        boolean isAlive = false;
+        List<Bucket> bucketList = minioClient.listBuckets();
+        for (Bucket bucket : bucketList) {
+            if (bucket.name().equals(env.getProperty("s3.bucket.name"))) {
+                isAlive = true;
+            }
+        }
+        System.err.println("Je suis en vie 1: " + isAlive);
     }
 
     
     
-    public void uploadFile(String uuid, String name) throws Exception {
+    public void uploadFile(String uuid, String name, long filelength, MultipartFile file) throws Exception {
         // if(!minioClient.bucketExists(bucketName)){
         //     minioClient.makeBucket(bucketName);
         // }
         setup();
-        System.err.println("Setup fini");
+        System.err.println("Setup fini : " + "Debut UploadFile");
         StringBuilder builder = new StringBuilder();
         InputStream istream = new ByteArrayInputStream(builder.toString().getBytes("UTF-8"));
-        ObjectWriteResponse  objectWriteResponse = minioClient.putObject(PutObjectArgs.builder()
+
+        // try {
+            ObjectWriteResponse  objectWriteResponse = minioClient.putObject(PutObjectArgs.builder()
                                                             .bucket(env.getProperty("s3.bucket.name"))
                                                             .object(uuid)
-                                                            .stream(istream,istream.available(), 0)
+                                                            .stream(istream,file.getSize() ,-1)
                                                             .build());
-                                                            
-        System.err.println("Mon Objet " + objectWriteResponse.bucket());
-        // minioClient.statObject(StatObjectArgs.builder()
-        //             .bucket(env.getProperty("s3.bucket.name"))
-        //             .object(uuid).build());
-        
-        // System.out.println("checkS3Alive");
-        // boolean isAlive = false;
-        // List<Bucket> bucketList = minioClient.listBuckets();
-        // for (Bucket bucket : bucketList) {
-        //     if (bucket.name().equals("accolade-dev")) {
-        //         isAlive = true;
-        //     }
-        // }
-        // System.err.println("isAlive : "+ isAlive);
+            System.err.println("Mon Objet " + objectWriteResponse.bucket());
 
-        System.out.println("checkS3Alive");
-        boolean isAlive = false;
-        List<Bucket> bucketList = minioClient.listObjects();
-        for (Bucket bucket : bucketList) {
-            if (bucket.name().equals("accolade-dev")) {
-                isAlive = true;
-            }
-        }
-        System.err.println("isAlive : "+ isAlive);
+        // } catch (Exception e) {
+        //     System.err.println("ERREUR !!!");
+        // }
+        
+        // Afficher la liste d'objets présent dans le S3
+        System.out.println("checkListObject");
+        
+        Iterable<Result<Item>> results = minioClient.listObjects(
+        ListObjectsArgs.builder()
+            .bucket("accolade-dev")
+            .build());
+        
+        // affiche la liste d'objet sur le s3
+        // for (Result<Item> result : results) {
+        //     System.err.println("List object : " + result.get().objectName() + " / size : " + result.get().size());
+        // }
+        
     }
 
     public void getFile(String uuid)  throws Exception{
-        setup();
-        System.err.println("Setup fini");
+        // setup();
+
+        // test S3 is Alive
+        System.out.println("checkS3Alive");
+        boolean isAlive = false;
+        List<Bucket> bucketList = minioClient.listBuckets();
+        for (Bucket bucket : bucketList) {
+            if (bucket.name().equals(env.getProperty("s3.bucket.name"))) {
+                isAlive = true;
+            }
+        }
+        System.err.println("Je suis en vie : " + isAlive);
+
+
+        // //////////////
+        System.err.println("Setup fini : " + "Debut getFile()");
         InputStream stream = minioClient.getObject(GetObjectArgs.builder()
-                                .bucket(env.getProperty("s3.bucket.name"))
+                                .bucket("accolade-dev")
                                 .object(uuid)
                                 .build());
         try{
@@ -146,32 +170,3 @@ public class UploadService {
     }
 
 }
-// StringBuilder builder = new StringBuilder();
-       
-//         File tempDir = new File(System.getProperty("java.io.tmpdir"));
-//         System.err.println("File is here : " + tempDir);
-//         File temp = File.createTempFile("originalFilename", ".txt", tempDir);
-
-//         tempDir.canWrite();
-//         tempDir.canRead();
-//         // try {
-//             ByteArrayInputStream bais = new ByteArrayInputStream(builder.toString().getBytes("UTF-8"));
-//             // System.err.println("JE SUIS LA ");
-//             OutputStream iofs = new FileOutputStream(tempDir);
-//             iofs.write(content);
-            
-            
-
-//             minioClient.putObject(PutObjectArgs.builder()
-//                     .bucket("dev-testMaven")
-//                     .object(name)
-//                     .stream(bais,bais.available(), -1)
-//                     .build());
-//             bais.close();
-            
-//             System.out.println("my object is upload ");
-                
-//             //  (defaultBucketName, defaultBaseFolder + name, file.getAbsolutePath());
-//         // } catch (Exception e) {
-//         //    throw new RuntimeException(e.getMessage());
-//         // }
